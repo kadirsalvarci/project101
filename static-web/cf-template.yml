@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: 2010-09-09 # zorunlu olmasi gerekir cfn yazinca bu formati bulursun version bilgisidir 
+Description: |
+  bu template 101 kitchen pro icin # burada nasil bir yapi kurduk onu anlatan bir kisim zorunlu degildr ama yakindir   
+Parameters: # bazi seyleri biz giremeyiz user girer o kisimlar var burada , ec2 turlesi filan 
+  Keyname:
+    Description: buradan keyname alinacak 
+    Type: AWS::EC2::KeyPair::KeyName
+
+  
+#Metadata: # acces key filan , securty key region filan burada tanimlanabilir 
+  
+#Mappings: # stack ler amac seklinde kullaniciyi yonlendirmek icin kullanilir !FindInMap fonksiyonu ile cagirilir 
+          # Sadece maping kismi deil her turlu adresleme yapabilirz  
+          # parametreden farki biraz da kisitlayabiliriz parametrede kullanici belirler 
+#Conditions:
+          # stack olusturulurken eger biz istiyorsak belli seyler burda kullanici sunu kullanirsa bun yap gibi yani eger li 
+Resources: #tek zorunlu olan kisim ve butun kaynaklar burada 
+  mySecurityGroup: #statefull yani inboundda olanlar outpud ile ayni olur ayrica burada isim verdigimiz icin groupname yazmaya gerek yok 
+      Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: my security group #required
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0 # belli bir ip adresi belirtirsem sadece bu pc ulsasin dersin 
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+
+  myEc2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-047a51fa27710816e
+      InstanceType: t2.micro
+      KernelId: String
+      KeyName: !Ref Keyname
+      SecurityGroupIds: !Ref mySecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub web server of {AWS::Stacname} stack  
+      UserData: 
+        Fn::!Base64
+          !Sub |
+            #! /bin/bash 
+      Volumes:
+        - Volume
+
+#Transform: #ozellile lambda icin kullanilir 
+  
+Outputs: # en son snuc kismini aoutpud kisminda goruntulememizi saglar 
+
+#herbit stack bir unic id atanir....
